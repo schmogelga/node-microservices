@@ -4,39 +4,39 @@ import { Account } from "../../../entity/account.entity";
 import { AccountService } from "./account.service";
 
 @Controller( 'accounts' )
+@UseInterceptors( BusinessInterceptor )
 export class AccountController {
 
     constructor( @Inject( AccountService ) private accountService: AccountService ){}
 
     @Post()
-    createAccount( @Body() body: { username: string, email: string } ){
+    async createAccount( @Body() body: { username: string, email: string } ){
             
-        this.accountService.createAccount( body.username, body.email );
+        return await this.accountService.createAccount( body.username, body.email );
     }
 
     @Get()
-    getAllAccounts() {
+    async getAllAccounts() {
 
-        this.accountService.getAllAccounts();
+        return await this.accountService.getAllAccounts();
     }
 
     @Get( ':id' )
-    @UseInterceptors( BusinessInterceptor )
     async getAccount( @Param( 'id' ) accountId: number ){
 
         return await this.accountService.geAccount( accountId );
     }
 
     @Delete( ':id' )
-    deleteAccount( @Param( 'id' ) accountId: number ){
+    async deleteAccount( @Param( 'id' ) accountId: number ){
         
-        return this.accountService.deleteAccount( accountId );
+        return await this.accountService.deleteAccount( accountId );
     }
 
     @Put( ':id' )
-    updateAccount( @Param( 'id' ) accountId: number, @Body() account: Account ){
+    async updateAccount( @Param( 'id' ) accountId: number, @Body() account: Account ){
 
-        return this.accountService.updateAccount( accountId, account );
+        return await this.accountService.updateAccount( accountId, account );
     }
 
 }

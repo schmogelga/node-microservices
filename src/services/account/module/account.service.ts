@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { NotFoundError } from "../../../util/error/NotFoundError";
+import { NotFoundError, ConflictError } from "../../../util/error/BusinessErrors";
 import { Account } from "../../../entity/account.entity";
 import { AccountRepository } from "./account.repository";
 
@@ -36,13 +36,23 @@ export class AccountService {
 
     async createAccount( username: string, email: string ): Promise<Account>{
 
+        if( await this.getAccountByUsername( username ) != null ){
+            
+            throw new ConflictError( "Username in use" );
+        }
+
         let account = new Account();
 
         account.email = email;
         account.username = username;
 
-        account = this.accountRepository.create( account )
+        account = this.accountRepository.create( account );
         return await this.accountRepository.save( account );
+    }
+
+    private async getAccountByUsername( username: string ): Promise<Account | null> {
+
+        return await this.accountRepository.findOne( { where: { username } } );
     }
 }
 

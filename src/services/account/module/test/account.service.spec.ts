@@ -8,6 +8,14 @@ import { getRepositoryToken } from "@nestjs/typeorm";
 
 describe('accountService', () => {
     let accountService: AccountService;
+    let accountRepositoryMock = {
+        create: jest.fn(),
+        save: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
+        find: jest.fn(),
+        findOne: jest.fn(),
+    }
 
     beforeEach( async () => {
         const app: TestingModule = await Test.createTestingModule({
@@ -16,14 +24,7 @@ describe('accountService', () => {
                 AccountService,
                 {
                     provide: getRepositoryToken(Account),
-                    useValue: {
-                        create: jest.fn(),
-                        save: jest.fn(),
-                        update: jest.fn(),
-                        delete: jest.fn(),
-                        find: jest.fn(),
-                        findOne: jest.fn(),
-                    },
+                    useValue: accountRepositoryMock,
                 },
             ],
         }).compile();

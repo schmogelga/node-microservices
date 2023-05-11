@@ -1,8 +1,8 @@
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler, NotFoundException } from "@nestjs/common"; 
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler, NotFoundException, ConflictException } from "@nestjs/common"; 
 import { Observable } from "rxjs";
-import { BusinessError } from "./BusinessError";
+import { BusinessError, NotFoundError, ConflictError } from "./BusinessErrors";
 import { tap, catchError } from 'rxjs/operators';
-import { NotFoundError } from "./NotFoundError";
+
 
 
 
@@ -15,10 +15,10 @@ export class BusinessInterceptor implements NestInterceptor {
             .pipe( 
                 catchError( (error: BusinessError) => {
                     
-                    if( error instanceof NotFoundError )
-                    {
-                        throw new NotFoundException( error.message );
-                    }
+
+                    if( error instanceof NotFoundError ) throw new NotFoundException( error.message );
+                    
+                    if( error instanceof ConflictError ) throw new ConflictException( error.message );
 
                     throw error;
 

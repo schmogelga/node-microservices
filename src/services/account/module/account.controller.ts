@@ -1,4 +1,5 @@
-import { Body, Controller, Inject, Post, Get, Delete, Put, Param } from "@nestjs/common";
+import { Body, Controller, Inject, Post, Get, Delete, Put, Param, UseInterceptors } from "@nestjs/common";
+import { BusinessInterceptor } from "../../../util/error/BusinessInterceptor";
 import { Account } from "../../../entity/account.entity";
 import { AccountService } from "./account.service";
 
@@ -9,27 +10,32 @@ export class AccountController {
 
     @Post()
     createAccount( @Body() body: { username: string, email: string } ){
+            
         this.accountService.createAccount( body.username, body.email );
     }
 
     @Get()
-    getAllAccounts(){
+    getAllAccounts() {
+
         this.accountService.getAllAccounts();
     }
 
     @Get( ':id' )
-    getAccount( @Param( 'id' ) accountId: number ){
-        this.accountService.geAccount( accountId );
+    @UseInterceptors( BusinessInterceptor )
+    async getAccount( @Param( 'id' ) accountId: number ){
+
+        return await this.accountService.geAccount( accountId );
     }
 
     @Delete( ':id' )
-    async deleteAccount( @Param( 'id' ) accountId: number ): Promise<void>{
+    deleteAccount( @Param( 'id' ) accountId: number ){
         
         return this.accountService.deleteAccount( accountId );
     }
 
     @Put( ':id' )
-    async updateAccount( @Param( 'id' ) accountId: number, @Body() account: Account ): Promise<Account>{
+    updateAccount( @Param( 'id' ) accountId: number, @Body() account: Account ){
+
         return this.accountService.updateAccount( accountId, account );
     }
 

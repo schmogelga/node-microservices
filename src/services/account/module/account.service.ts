@@ -1,36 +1,37 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ObjectId, Repository } from "typeorm";
+import { NotFoundError } from "../../../util/error/NotFoundError";
 import { Account } from "../../../entity/account.entity";
 import { AccountRepository } from "./account.repository";
 
 @Injectable()
 export class AccountService {
     
-    constructor( @InjectRepository(Account) private accountRepositorry: AccountRepository ){}
+    constructor( @InjectRepository(Account) private accountRepository: AccountRepository ){}
     
     async updateAccount( id: number, account: Account ): Promise<Account> {
-        await this.accountRepositorry.update( id, account );
+        await this.accountRepository.update( id, account );
         return await this.geAccount( id );
     }
     
     async deleteAccount( id: number ): Promise<void> {
         
         await this.geAccount( id );
-        await this.accountRepositorry.delete( id );
+        await this.accountRepository.delete( id );
     }
 
     async geAccount( id: number ): Promise<Account> {
     
-        const account = await this.accountRepositorry.findOne( { where: { id } } );
+        const account = await this.accountRepository.findOne( { where: { id } } );
         if( !account ){
-            throw new Error( "User not found" );
+            throw new NotFoundError( "Account not found" );
         }
         
         return account;
     }
+
     async getAllAccounts(): Promise<Account[]> {
-        return await this.accountRepositorry.find();
+        return await this.accountRepository.find();
     }
 
     async createAccount( username: string, email: string ): Promise<Account>{
@@ -40,8 +41,8 @@ export class AccountService {
         account.email = email;
         account.username = username;
 
-        account = this.accountRepositorry.create( account )
-        return await this.accountRepositorry.save( account );
+        account = this.accountRepository.create( account )
+        return await this.accountRepository.save( account );
     }
 }
 

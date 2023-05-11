@@ -1,0 +1,24 @@
+import { expect } from '@jest/globals';
+import { Test, TestingModule } from '@nestjs/testing';
+import { beforeEach, describe, it } from 'node:test';
+import { AccountController } from '../account.controller';
+import { AccountRepository } from '../account.repository';
+import { AccountService } from '../account.service';
+
+describe('AccountController', () => {
+    let accountController: AccountController;
+
+    beforeEach( async () => {
+        const app: TestingModule = await Test.createTestingModule({
+            imports: [AccountRepository],
+            controllers: [AccountController],
+            providers: [AccountService],
+        }).compile();
+    
+        accountController = app.get<AccountController>(AccountController);
+    });
+
+    it('AccountController - should be defined', () => {
+        expect(accountController).toBeDefined();
+    });
+});

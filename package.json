@@ -6,6 +6,7 @@
   "scripts": {
     "test": "jest --runInBand",
     "start": "ts-node src/services/account/main.ts",
+    "start:product": "ts-node src/services/product/app.ts",
     "start:dev": "nodemon src/services/account/main.ts"
   },
   "keywords": [],

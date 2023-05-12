@@ -30,7 +30,7 @@ export class AccountController {
     @Delete( ':id' )
     async deleteAccount( @Param( 'id' ) accountId: number ){
         
-        return await this.accountService.deleteAccount( accountId );
+        await this.accountService.deleteAccount( accountId );
     }
 
     @Put( ':id' )

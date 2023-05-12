@@ -10,6 +10,12 @@ export class AccountService {
     constructor( @InjectRepository(Account) private accountRepository: AccountRepository ){}
     
     async updateAccount( id: number, account: Account ): Promise<Account> {
+        
+        if( await this.getAccountByUsername( account.username ) != null ){
+            
+            throw new ConflictError( "Username in use" );
+        }
+
         await this.accountRepository.update( id, account );
         return await this.geAccount( id );
     }

@@ -1,5 +1,4 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { beforeEach, describe, it } from "node:test";
 import { AccountController } from "../account.controller";
 import { AccountService } from "../account.service";
 import { expect, jest } from "@jest/globals"
@@ -32,7 +31,7 @@ describe('accountService', () => {
         accountService = app.get<AccountService>(AccountService);
     })
 
-    it('AccountService - should be defined', () => {
+    it('AccountService - should be defined', async () => {
         expect(accountService).toBeDefined();
     });
 

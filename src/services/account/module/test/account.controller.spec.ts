@@ -2,7 +2,6 @@ import { expect, jest } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Account } from '../../../../entity/account.entity';
-import { beforeEach, describe, it } from 'node:test';
 import { AccountController } from '../account.controller';
 import { AccountRepository } from '../account.repository';
 import { AccountService } from '../account.service';
@@ -45,7 +44,7 @@ describe( 'AccountController', () => {
         accountService = app.get<AccountService>( AccountService );
     });
 
-    it('AccountController - should be defined', () => {
+    test('AccountController - should be defined', () => {
         expect(accountController).toBeDefined();
     });
 
@@ -54,7 +53,7 @@ describe( 'AccountController', () => {
 
         it('should return an Account array', async () => {
             
-            accountRepositoryMock.find.mockReturnValue( [ account ] )
+            accountRepositoryMock.find.mockReturnValueOnce( [ account ] )
 
             const result = await accountController.getAllAccounts(); 
 
@@ -65,22 +64,22 @@ describe( 'AccountController', () => {
 
     describe( 'getAccount', () => {
 
-        it( 'should return an account with the given id', async () => {
+        it( 'should return the Account with the given id', async () => {
 
-            accountRepositoryMock.findOne.mockReturnValue( account );
+            accountRepositoryMock.findOne.mockReturnValueOnce( account );
 
-            const result = await accountController.getAccount( 0 );
+            const result = await accountController.getAccount( account.id );
 
-            expect( accountRepositoryMock.findOne ).toHaveBeenCalledWith( { where: { id: 0 } } );
+            expect( accountRepositoryMock.findOne ).toHaveBeenCalledWith( { where: { id: account.id } } );
             expect( result ).toEqual( account );
         });
 
         it( 'shoul throw NotFoundError', async () => {
 
-            accountRepositoryMock.findOne.mockReturnValue( !account );
+            accountRepositoryMock.findOne.mockReturnValueOnce( !account );
 
             try {
-                await accountController.getAccount( 0 );
+                await accountController.getAccount( account.id );
             } catch ( error ) {
 
                 expect( error ).toBeInstanceOf( NotFoundError );
@@ -90,24 +89,99 @@ describe( 'AccountController', () => {
 
     describe( 'createAccount', () => {
 
-        it( 'should create an account', async () => {
+        it( 'should create an Account', async () => {
 
-            accountRepositoryMock.findOne.mockReturnValue( null )
-            accountRepositoryMock.save.mockReturnValue( account );
+            accountRepositoryMock.findOne.mockReturnValueOnce( null )
+            accountRepositoryMock.create.mockReturnValueOnce( account );
+            accountRepositoryMock.save.mockReturnValueOnce( account );
         
             const result = await accountController.createAccount( account );
 
             expect( accountRepositoryMock.findOne ).toHaveBeenCalledWith( { where: { username: account.username } } );
+            expect( accountRepositoryMock.create ).toHaveBeenCalledWith( account );
+            expect( accountRepositoryMock.save ).toHaveBeenCalledWith( account );
             expect( result ).toEqual( account ); 
         });
     
         it( 'should throw ConflictError', async () => {
 
-            accountRepositoryMock.findOne.mockReturnValue( account )
+            accountRepositoryMock.findOne.mockReturnValueOnce( account )
 
             try {
                 
                 await accountController.createAccount( account );
+            } catch ( error ) {
+                
+                expect( error ).toBeInstanceOf( ConflictError );
+            }
+        });
+    });
+
+    describe( 'deleteAccount', () => {
+
+        it( 'should delete the Account with the given id', async () => {
+
+            accountRepositoryMock.findOne.mockReturnValueOnce( account );
+
+            await accountController.deleteAccount( account.id );
+
+            expect( accountRepositoryMock.findOne ).toHaveBeenCalledWith( { where: { id: account.id } } );
+            expect( accountRepositoryMock.delete ).toHaveBeenCalledWith( account.id );            
+        });
+
+        it( 'should throw NotFoundError', async () => {
+
+            accountRepositoryMock.findOne.mockReturnValueOnce( null );
+
+            try {
+                await accountController.deleteAccount( account.id );
+                
+            } catch (error) {
+                
+                expect( error ).toBeInstanceOf( NotFoundError );
+            }
+        });
+    });
+
+    describe( 'updateAccount', () => {
+
+        it( 'should update the Account with the given id', async () => {
+
+            accountRepositoryMock.findOne.mockReturnValueOnce( null );
+            accountRepositoryMock.findOne.mockReturnValueOnce( account );
+            accountRepositoryMock.update.mockReturnValueOnce( account );
+
+            const result = await accountController.updateAccount( account.id, account );
+
+            expect( accountRepositoryMock.findOne ).toHaveBeenCalledWith( { where: { username: account.username } } );
+            expect( accountRepositoryMock.update ).toHaveBeenCalledWith( account.id, account ); 
+            expect( accountRepositoryMock.findOne ).toHaveBeenCalledWith( { where: { id: account.id } } );
+
+            expect( result ).toEqual( account );
+        });
+        
+        it( 'should throw ConflictError', async () => {
+           
+            accountRepositoryMock.findOne.mockReturnValueOnce( null );
+            accountRepositoryMock.update.mockReturnValueOnce( account );    
+            accountRepositoryMock.findOne.mockReturnValueOnce( null );
+
+            try {
+                
+                await accountController.updateAccount( account.id, account );
+            } catch (error) {
+                
+                expect( error ).toBeInstanceOf( NotFoundError );
+            }
+        });
+
+        it( 'should throw NotFoundError', async () => {
+
+            accountRepositoryMock.findOne.mockReturnValueOnce( account );
+            
+            try {
+
+                await accountController.updateAccount( account.id, account );
             } catch ( error ) {
                 
                 expect( error ).toBeInstanceOf( ConflictError );

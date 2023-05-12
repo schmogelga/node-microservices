@@ -9,7 +9,6 @@ import { NotFoundError, ConflictError } from '../../../../util/error/BusinessErr
 
 describe( 'AccountController', () => {
     let accountController: AccountController;
-    let accountService: AccountService;
 
     let accountRepositoryMock = {
         create: jest.fn(),
@@ -41,7 +40,6 @@ describe( 'AccountController', () => {
         }).compile();
     
         accountController = app.get<AccountController>( AccountController );
-        accountService = app.get<AccountService>( AccountService );
     });
 
     test('AccountController - should be defined', () => {

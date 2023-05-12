@@ -16,3 +16,5 @@ export class Account {
     @Column()
     password: string = "";
 }
+
+// TODO: separar databases

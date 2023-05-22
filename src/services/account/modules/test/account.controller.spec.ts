@@ -42,7 +42,7 @@ describe( 'AccountController', () => {
         accountController = app.get<AccountController>( AccountController );
     });
 
-    test('AccountController - should be defined', () => {
+    it('AccountController - should be defined', () => {
         expect(accountController).toBeDefined();
     });
 

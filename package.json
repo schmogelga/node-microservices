@@ -5,9 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test:account": "jest --runInBand src/services/account/modules/test/*.*.spec.ts",
+    "test:product": "jest --runInBand src/services/product/test/*.*.spec.ts",
     "test:product_express": "mocha src/services/product_express/test/*.*.spec.js",
-    "test": "npm run test:account",
-    "start": "ts-node src/services/account/main.ts",
+    "test": "npm run test:account; npm run test:product;",
+    "start:account": "ts-node src/services/account/main.ts",
+    "start:product": "ts-node src/services/product/main.ts",
     "start:product_express": "ts-node src/services/product_express/app.ts",
     "start:dev": "nodemon src/services/account/main.ts"
   },
